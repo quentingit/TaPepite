@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "TaPépite",
+  "version": "1.0",
+  "description": "Gagnez du temps, trouvez rapidement le bien qui vous correspond, et ne laissez plus passer les opportunités en or !",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["*://*.leboncoin.fr/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-gray.png",
+      "48": "icons/icon-gray.png",
+      "128": "icons/icon-gray.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon-gray.png",
+    "48": "icons/icon-gray.png",
+    "128": "icons/icon-gray.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.leboncoin.fr/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

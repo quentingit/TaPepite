@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaPépite</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        width: 500px;
+        height: 500px;
+        overflow-y: auto;
+      }
+      .quartier {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .quartier label {
+        margin-left: 10px;
+      }
+      .endPage {
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TaPépite</h1>
+    <p>
+      Trouvez rapidement le bien qui vous correspond, et ne laissez plus passer
+      les opportunités en or !
+    </p>
+
+    <h3>Quartiers Découverts</h3>
+    <div id="quartiers-list"></div>
+
+    <div class="endPage"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>
