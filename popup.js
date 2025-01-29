@@ -1,6 +1,20 @@
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Script du popup chargé !");
 
+  //SI ON EST EN DEHORS DE LEBOCOIN
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const activeTab = tabs[0];
+    if (!activeTab || !activeTab.url.includes("leboncoin.fr")) {
+      // Afficher un message d'erreur si l'utilisateur n'est pas sur Leboncoin
+      document.body.innerHTML = `
+        <h1>TaPépite</h1>
+        <p style="color: red; text-align: center; font-weight: bold;">
+          🚨 Vous devez être sur <strong>Leboncoin</strong> pour utiliser cette extension.
+        </p>
+      `;
+    }
+  });
+
   const quartiersList = document.getElementById("quartiers-list");
 
   // Création des boutons Sélectionner tout et Désélectionner tout

@@ -105,6 +105,7 @@ const ajouterQuartier = (quartier) => {
         quartiersExistants.push({
           quartier,
           display: true,
+          favorite: false,
         });
 
         // Mise à jour dans chrome.storage.local
