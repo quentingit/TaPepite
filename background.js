@@ -1,4 +1,6 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  console.log("Tab updated:", tabId, changeInfo, tab.url);
+
   if (changeInfo.status === "complete" && tab.url) {
     if (tab.url.includes("leboncoin.fr")) {
       console.log("Page leboncoin.fr détectée, changement d'icône en vert.");

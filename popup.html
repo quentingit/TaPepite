@@ -9,33 +9,93 @@
         font-family: Arial, sans-serif;
         margin: 20px;
         width: 500px;
-        height: 500px;
+        height: 800px;
+        background-color: #f9f9f9;
         overflow-y: auto;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      p {
+        color: #555;
+        text-align: center;
+      }
+      h3 {
+        color: #333;
+        margin-top: 30px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+      }
+      #quartiers-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
       }
       .quartier {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
+        justify-content: space-between;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
-      .quartier label {
-        margin-left: 10px;
+      .quartier-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
-      .endPage {
-        height: 50px;
+      .quartier-info label {
+        font-size: 16px;
+        color: #333;
+      }
+      .quartier-info span {
+        font-size: 14px;
+        color: #777;
+      }
+      /* Style pour le bouton de test (optionnel) */
+      .test-button {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .test-button:hover {
+        background-color: #0056b3;
+      }
+      #quartiers-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .quartier {
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
     </style>
   </head>
   <body>
     <h1>TaPépite</h1>
     <p>
-      Trouvez rapidement le bien qui vous correspond, et ne laissez plus passer
-      les opportunités en or !
+      Trouvez rapidement le bien qui vous correspond, <br />
+      ne laissez plus passer les opportunités en or !
     </p>
 
-    <h3>Quartiers Découverts</h3>
+    <h3>Les Quartiers</h3>
     <div id="quartiers-list"></div>
 
-    <div class="endPage"></div>
+    <!-- Bouton de test (optionnel) -->
+    <!-- <button class="test-button">Stocker Quartier de Test</button> -->
+
     <script src="popup.js"></script>
   </body>
 </html>

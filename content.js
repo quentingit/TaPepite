@@ -1,6 +1,34 @@
 // Initialisation d'un cache global pour stocker les données récupérées
 const dataCache = new Map();
 
+const reinitialiserStorageQuartiers = (callback) => {
+  chrome.storage.local.set({ quartiersDecouverts: [] }, () => {
+    if (chrome.runtime.lastError) {
+      console.error(
+        "Erreur lors de la réinitialisation :",
+        chrome.runtime.lastError
+      );
+    } else {
+      console.log("La clé quartiersDecouverts a été réinitialisée.");
+      if (callback) callback();
+    }
+  });
+};
+
+const initialiserStorageQuartiers = (callback) => {
+  chrome.storage.local.get(["quartiersDecouverts"], (result) => {
+    if (!result.quartiersDecouverts) {
+      // Initialiser la clé avec un tableau vide si elle n'existe pas
+      chrome.storage.local.set({ quartiersDecouverts: [] }, () => {
+        console.log("Clé quartiersDecouverts initialisée.");
+        if (callback) callback();
+      });
+    } else {
+      if (callback) callback();
+    }
+  });
+};
+
 const calculerRentabilite = (prix, surface) => {
   if (!prix || !surface) {
     return null;
@@ -58,33 +86,50 @@ const fetchDetails = async (url) => {
 
 // Liste globale pour stocker les quartiers découverts
 const quartiersDecouverts = new Set();
-
-// Fonction pour ajouter et stocker les quartiers
 const ajouterQuartier = (quartier) => {
   if (
     quartier &&
     quartier !== "Erreur lors de la récupération des données" &&
     quartier !== "Quartier non trouvé"
   ) {
-    quartiersDecouverts.add(quartier);
+    chrome.storage.local.get(["quartiersDecouverts"], (result) => {
+      const quartiersExistants = result.quartiersDecouverts || [];
 
-    // Mise à jour dans chrome.storage.local
-    chrome.storage.local.set(
-      { quartiersDecouverts: Array.from(quartiersDecouverts) },
-      () => {
-        if (chrome.runtime.lastError) {
-          console.error(
-            "Erreur lors de la sauvegarde :",
-            chrome.runtime.lastError
-          );
-        } else {
-          console.log(
-            "Quartiers enregistrés avec succès dans chrome.storage.local :",
-            quartiersDecouverts
-          );
-        }
+      // Vérifie si le quartier existe déjà
+      const quartierExistant = quartiersExistants.some(
+        (q) => q.quartier.toLowerCase() === quartier.toLowerCase()
+      );
+
+      if (!quartierExistant) {
+        // Ajoute le quartier s'il n'existe pas déjà
+        quartiersExistants.push({
+          quartier,
+          display: true,
+        });
+
+        // Mise à jour dans chrome.storage.local
+        chrome.storage.local.set(
+          { quartiersDecouverts: quartiersExistants },
+          () => {
+            if (chrome.runtime.lastError) {
+              console.error(
+                "Erreur lors de la sauvegarde :",
+                chrome.runtime.lastError
+              );
+            } else {
+              console.log(
+                "Quartiers enregistrés avec succès dans chrome.storage.local :",
+                quartiersExistants
+              );
+            }
+          }
+        );
+      } else {
+        console.log(
+          `Le quartier "${quartier}" existe déjà, il n'a pas été ajouté.`
+        );
       }
-    );
+    });
   }
 };
 
@@ -146,10 +191,78 @@ const ajouterCalculRentabiliteDiscret = () => {
     }
   });
 };
+const cacherAnnoncesQuartiers = (retryCount = 5, retryDelay = 500) => {
+  chrome.storage.local.get(["quartiersDecouverts"], (result) => {
+    let quartiersSelectionnes = result.quartiersDecouverts || [];
 
-// Exécuter la fonction
-ajouterCalculRentabiliteDiscret();
+    // Sélectionne toutes les annonces sur LeBonCoin
+    const annonces = document.querySelectorAll(
+      '[data-qa-id="aditem_container"]'
+    );
 
-// Observer le DOM pour les chargements dynamiques
-const observer = new MutationObserver(ajouterCalculRentabiliteDiscret);
-observer.observe(document.body, { childList: true, subtree: true });
+    let missingBadges = [];
+
+    annonces.forEach((annonce) => {
+      console.log("Analyse de l'annonce :", annonce);
+      let badgeQuartier = annonce.querySelector(".badge-quartier");
+
+      if (!badgeQuartier) {
+        missingBadges.push(annonce);
+        return;
+      }
+
+      let quartierTexte = badgeQuartier.textContent.replace(" - ", "").trim();
+
+      // Vérifie si le quartier a `display: false`
+      let estCache = quartiersSelectionnes.some(
+        (q) =>
+          q.quartier.toLowerCase() === quartierTexte.toLowerCase() &&
+          q.display === false
+      );
+
+      // Cache l'annonce si `display` est `false`
+      annonce.style.display = estCache ? "none" : "block";
+    });
+
+    // Si certaines annonces n'ont pas encore leur badge, on retente après un délai
+    if (missingBadges.length > 0 && retryCount > 0) {
+      console.log(
+        `Retry cacherAnnoncesQuartiers - Tentative restante : ${retryCount}`
+      );
+      setTimeout(
+        () => cacherAnnoncesQuartiers(retryCount - 1, retryDelay),
+        retryDelay
+      );
+    }
+  });
+};
+
+//////////
+//START APP
+//////////
+
+//reinitialiserStorageQuartiers();
+initialiserStorageQuartiers(async () => {
+  //on ajoute les infos
+  ajouterCalculRentabiliteDiscret();
+  //on cache les elements filtres
+  cacherAnnoncesQuartiers();
+
+  // Observer le DOM pour les chargements dynamiques
+  const observer = new MutationObserver(() => {
+    ajouterCalculRentabiliteDiscret();
+    cacherAnnoncesQuartiers();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+
+// Ajoutez ici l'écouteur d'événement pour détecter les changements dans le stockage local
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.quartiersDecouverts) {
+    console.log(
+      "Modification détectée dans quartiersDecouverts :",
+      changes.quartiersDecouverts.newValue
+    );
+    cacherAnnoncesQuartiers();
+  }
+});
