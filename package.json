@@ -1,0 +1,32 @@
+{
+  "name": "tapepite",
+  "version": "1.0.0",
+  "main": "content.js",
+  "scripts": {
+    "build": "webpack --mode production --config webpack.config.ts",
+    "start": "npm run build && web-ext run --source-dir ./dist --target chromium",
+    "watch": "webpack --mode development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quentingit/TaPepite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/quentingit/TaPepite/issues"
+  },
+  "homepage": "https://github.com/quentingit/TaPepite#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/chrome": "^0.0.299",
+    "copy-webpack-plugin": "^12.0.2",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "web-ext": "^8.3.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
